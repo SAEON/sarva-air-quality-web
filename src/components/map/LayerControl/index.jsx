@@ -1,21 +1,33 @@
-import { Box, FormControl, FormGroup, FormControlLabel, Checkbox, Typography, Paper } from '@mui/material';
+import {
+  Box,
+  FormControl,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Typography,
+  Paper,
+} from '@mui/material';
 
 function LayerControl({ layers, activeLayers, onLayerToggle }) {
   return (
-    <Paper sx={{ 
-      position: 'absolute', 
-      top: 10, 
-      right: 10,
-      zIndex: 1000,
-      p: 2,
-      width: 250,
-      boxShadow: 2,
-      backgroundColor: 'rgba(255, 255, 255, 0.9)'
-    }}>
-      <Typography variant="subtitle1" gutterBottom>Map Layers</Typography>
+    <Paper
+      sx={{
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        zIndex: 1000,
+        p: 2,
+        width: 250,
+        boxShadow: 2,
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      }}
+    >
+      <Typography variant="subtitle1" gutterBottom>
+        Map Layers
+      </Typography>
       <FormControl component="fieldset">
         <FormGroup>
-          {layers.map(layer => (
+          {layers.map((layer) => (
             <FormControlLabel
               key={layer.id}
               control={

@@ -6,30 +6,27 @@ function TimeSlider({ dates, selectedDate, onChange }) {
   const [value, setValue] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const intervalRef = useRef(null);
-  
 
   useEffect(() => {
     if (selectedDate && dates.length > 0) {
-      const index = dates.findIndex(d => formatDate(d) === formatDate(selectedDate));
+      const index = dates.findIndex((d) => formatDate(d) === formatDate(selectedDate));
       if (index !== -1) {
         setValue(index);
       }
     }
   }, [selectedDate, dates]);
 
-  const formatDate = (dateString) => {
-    return dateString.split('T')[0];
-  };
+  const formatDate = (dateString) => dateString.split('T')[0];
 
   useEffect(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    
+
     if (isPlaying && dates.length > 0) {
       intervalRef.current = setInterval(() => {
-        setValue(prev => {
+        setValue((prev) => {
           const newValue = prev >= dates.length - 1 ? 0 : prev + 1;
           const nextDate = formatDate(dates[newValue]);
           onChange(nextDate);
@@ -37,7 +34,7 @@ function TimeSlider({ dates, selectedDate, onChange }) {
         });
       }, 1000);
     }
-    
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -53,28 +50,27 @@ function TimeSlider({ dates, selectedDate, onChange }) {
   };
 
   const handlePlayToggle = () => {
-    setIsPlaying(prev => !prev);
+    setIsPlaying((prev) => !prev);
   };
-
 
   const generateTimelineMarks = () => {
     if (!dates || dates.length < 2) return [];
-    
+
     const marks = [];
     const totalDates = dates.length;
-    
+
     // Calculate the number of intervals based on the number of dates
-    const intervals = 4; 
+    const intervals = 4;
     for (let i = 0; i <= intervals; i++) {
       const index = Math.floor((totalDates - 1) * (i / intervals));
       if (index >= 0 && index < totalDates) {
         marks.push({
           value: index,
-          label: format(parseISO(formatDate(dates[index])), 'MMM yyyy')
+          label: format(parseISO(formatDate(dates[index])), 'MMM yyyy'),
         });
       }
     }
-    
+
     return marks;
   };
 
@@ -83,63 +79,70 @@ function TimeSlider({ dates, selectedDate, onChange }) {
   const timelineMarks = generateTimelineMarks();
 
   return (
-    <Box sx={{ 
-      position: 'absolute', 
-      bottom: 20, 
-      left: '50%', 
-      transform: 'translateX(-50%)',
-      width: '92%', 
-      maxWidth: 1000,
-      bgcolor: 'rgba(255, 255, 255, 0.9)',
-      borderRadius: 2,
-      p: 1.5,
-      zIndex: 1000,
-      boxShadow: 2
-    }}>
+    <Box
+      sx={{
+        position: 'absolute',
+        bottom: 20,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '92%',
+        maxWidth: 1000,
+        bgcolor: 'rgba(255, 255, 255, 0.9)',
+        borderRadius: 2,
+        p: 1.5,
+        zIndex: 1000,
+        boxShadow: 2,
+      }}
+    >
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-        <Typography variant="subtitle1" sx={{ 
-          flexGrow: 1, 
-          color: 'text.secondary',
-          fontSize: '0.95rem'
-        }}>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            flexGrow: 1,
+            color: 'text.secondary',
+            fontSize: '0.95rem',
+          }}
+        >
           {selectedDate ? format(parseISO(formatDate(selectedDate)), 'MMMM d, yyyy') : ''}
         </Typography>
-        <Button 
-          onClick={handlePlayToggle} 
-          size="small" 
+        <Button
+          onClick={handlePlayToggle}
+          size="small"
           variant="contained"
-          color={isPlaying ? "error" : "primary"}
-          sx={{ 
+          color={isPlaying ? 'error' : 'primary'}
+          sx={{
             minWidth: '60px',
             py: 0.5,
-            fontSize: '0.8rem'
+            fontSize: '0.8rem',
           }}
         >
           {isPlaying ? 'Pause' : 'Play'}
         </Button>
       </Box>
-      <Box sx={{ 
-        px: 2,
-        position: 'relative',
-        height: 32,
-      }}>
+      <Box
+        sx={{
+          px: 2,
+          position: 'relative',
+          height: 32,
+        }}
+      >
         {/* Vertical marker lines for month indicators */}
         {timelineMarks.map((mark, index) => (
           <Box
             key={index}
             sx={{
               position: 'absolute',
-              left: `calc(${(mark.value / (dates.length - 1)) * 100}% + 1px)`, 
+              left: `calc(${(mark.value / (dates.length - 1)) * 100}% + 1px)`,
               height: '8px',
               width: '1px',
               backgroundColor: 'grey.400',
               top: '11px',
-              zIndex: 1,    
+              zIndex: 1,
               transform: 'translateX(-50%)',
             }}
           />
         ))}
-        
+
         <Slider
           value={value}
           onChange={handleSliderChange}
@@ -174,28 +177,30 @@ function TimeSlider({ dates, selectedDate, onChange }) {
             },
           }}
         />
-        
+
         {/* Custom month labels */}
-        <Box sx={{ 
-          position: 'absolute', 
-          width: '100%',
-          top: 21,
-          left: 0,
-          display: 'flex',
-          justifyContent: 'space-between',
-          px: 0.5,
-        }}>
+        <Box
+          sx={{
+            position: 'absolute',
+            width: '100%',
+            top: 21,
+            left: 0,
+            display: 'flex',
+            justifyContent: 'space-between',
+            px: 0.5,
+          }}
+        >
           {timelineMarks.map((mark, index) => (
-            <Typography 
-              key={index} 
-              variant="caption" 
-              sx={{ 
+            <Typography
+              key={index}
+              variant="caption"
+              sx={{
                 fontSize: '0.65rem',
                 color: 'text.secondary',
                 transform: 'translateX(-50%)',
                 position: 'absolute',
                 left: `${(mark.value / (dates.length - 1)) * 100}%`,
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
               }}
             >
               {mark.label}

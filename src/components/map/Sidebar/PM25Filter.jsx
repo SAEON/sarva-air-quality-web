@@ -6,13 +6,13 @@ import { getPM25Stats } from '@/api/airQuality';
 
 function PM25Filter({ value, onChange }) {
   const [localValue, setLocalValue] = useState(value);
-  
+
   // Get PM2.5 statistics to set appropriate range
   const { data: statsData, isLoading } = useQuery({
     queryKey: ['pm25Stats'],
-    queryFn: getPM25Stats
+    queryFn: getPM25Stats,
   });
-  
+
   // Update local state when props change
   useEffect(() => {
     setLocalValue(value);
@@ -21,29 +21,29 @@ function PM25Filter({ value, onChange }) {
   // Default min/max values in case stats aren't loaded yet
   const minPM25 = statsData?.min_pm25 || 0;
   const maxPM25 = statsData?.max_pm25 || 300;
-  
+
   const handleSliderChange = (_, newValue) => {
     setLocalValue(newValue);
   };
-  
+
   const handleSliderChangeCommitted = (_, newValue) => {
     onChange(newValue);
   };
-  
+
   const handleMinInputChange = (event) => {
     const newMin = Number(event.target.value);
     if (!isNaN(newMin) && newMin >= minPM25 && newMin <= localValue[1]) {
       setLocalValue([newMin, localValue[1]]);
     }
   };
-  
+
   const handleMaxInputChange = (event) => {
     const newMax = Number(event.target.value);
     if (!isNaN(newMax) && newMax <= maxPM25 && newMax >= localValue[0]) {
       setLocalValue([localValue[0], newMax]);
     }
   };
-  
+
   const handleInputBlur = () => {
     onChange(localValue);
   };
@@ -63,7 +63,7 @@ function PM25Filter({ value, onChange }) {
           Min: {minPM25.toFixed(0)} | Max: {maxPM25.toFixed(0)}
         </Typography>
       </Box>
-      
+
       <Slider
         value={localValue}
         onChange={handleSliderChange}
@@ -73,7 +73,7 @@ function PM25Filter({ value, onChange }) {
         max={maxPM25}
         sx={{ mt: 3, mb: 2 }}
       />
-      
+
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <TextField

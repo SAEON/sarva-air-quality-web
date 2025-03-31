@@ -1,13 +1,13 @@
-import { 
-  Box, 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem, 
-  Checkbox, 
-  ListItemText, 
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Checkbox,
+  ListItemText,
   OutlinedInput,
-  Typography
+  Typography,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { getAllCities } from '@/api/airQuality';
@@ -15,7 +15,7 @@ import { getAllCities } from '@/api/airQuality';
 function CityFilter({ selectedCities, onChange }) {
   const { data: citiesData, isLoading } = useQuery({
     queryKey: ['cities'],
-    queryFn: getAllCities
+    queryFn: getAllCities,
   });
 
   const handleChange = (event) => {

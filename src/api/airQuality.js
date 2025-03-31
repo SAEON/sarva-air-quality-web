@@ -6,14 +6,12 @@ export const getAirQualityData = async ({ queryKey }) => {
   return response.data;
 };
 
-
 export const getAirQualityByDate = async ({ queryKey }) => {
   const [_, date] = queryKey;
-  
-  const formattedDate = date instanceof Date 
-    ? date.toISOString().split('T')[0]
-    : date.split('T')[0];
-  
+
+  const formattedDate =
+    date instanceof Date ? date.toISOString().split('T')[0] : date.split('T')[0];
+
   const response = await apiClient.get(`/air-quality/date/${formattedDate}`);
   return response.data;
 };
@@ -49,12 +47,10 @@ export const getTimeSeries = async ({ queryKey }) => {
   return response.data;
 };
 
-
 export const getPM25Stats = async () => {
   const response = await apiClient.get('/air-quality/stats/pm25');
   return response.data;
 };
-
 
 export const getPopulationDensityStats = async () => {
   const response = await apiClient.get('/air-quality/stats/population-density');

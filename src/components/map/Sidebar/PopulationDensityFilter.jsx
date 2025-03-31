@@ -6,13 +6,13 @@ import { getPopulationDensityStats } from '@/api/airQuality';
 
 function PopulationDensityFilter({ value, onChange }) {
   const [localValue, setLocalValue] = useState(value);
-  
+
   // Get population density statistics to set appropriate range
   const { data: statsData, isLoading } = useQuery({
     queryKey: ['populationDensityStats'],
-    queryFn: getPopulationDensityStats
+    queryFn: getPopulationDensityStats,
   });
-  
+
   // Update local state when props change
   useEffect(() => {
     setLocalValue(value);
@@ -21,29 +21,29 @@ function PopulationDensityFilter({ value, onChange }) {
   // Default min/max values in case stats aren't loaded yet
   const minDensity = statsData?.min_density || 0;
   const maxDensity = statsData?.max_density || 20000;
-  
+
   const handleSliderChange = (_, newValue) => {
     setLocalValue(newValue);
   };
-  
+
   const handleSliderChangeCommitted = (_, newValue) => {
     onChange(newValue);
   };
-  
+
   const handleMinInputChange = (event) => {
     const newMin = Number(event.target.value);
     if (!isNaN(newMin) && newMin >= minDensity && newMin <= localValue[1]) {
       setLocalValue([newMin, localValue[1]]);
     }
   };
-  
+
   const handleMaxInputChange = (event) => {
     const newMax = Number(event.target.value);
     if (!isNaN(newMax) && newMax <= maxDensity && newMax >= localValue[0]) {
       setLocalValue([localValue[0], newMax]);
     }
   };
-  
+
   const handleInputBlur = () => {
     onChange(localValue);
   };
@@ -63,7 +63,7 @@ function PopulationDensityFilter({ value, onChange }) {
           Min: {minDensity.toFixed(0)} | Max: {maxDensity.toFixed(0)}
         </Typography>
       </Box>
-      
+
       <Slider
         value={localValue}
         onChange={handleSliderChange}
@@ -73,7 +73,7 @@ function PopulationDensityFilter({ value, onChange }) {
         max={maxDensity}
         sx={{ mt: 3, mb: 2 }}
       />
-      
+
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <TextField

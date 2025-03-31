@@ -1,8 +1,6 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
 import MapView from './pages/MapView';
-import Dashboard from './pages/Dashboard';
-import DataAnalysis from './pages/DataAnalysis';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -34,8 +32,6 @@ function App() {
       <HashRouter>
         <Routes>
           <Route path="/" element={<MapView />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/analysis" element={<DataAnalysis />} />
         </Routes>
       </HashRouter>
     </ThemeProvider>
