@@ -1,4 +1,3 @@
-// src/components/map/TimeSlider/index.jsx
 import { useState, useEffect, useRef } from 'react';
 import { Box, Slider, Typography, Button } from '@mui/material';
 import { format, parseISO } from 'date-fns';
@@ -8,7 +7,7 @@ function TimeSlider({ dates, selectedDate, onChange }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const intervalRef = useRef(null);
   
-  // Update slider position when selectedDate changes from parent
+
   useEffect(() => {
     if (selectedDate && dates.length > 0) {
       const index = dates.findIndex(d => formatDate(d) === formatDate(selectedDate));
@@ -22,7 +21,6 @@ function TimeSlider({ dates, selectedDate, onChange }) {
     return dateString.split('T')[0];
   };
 
-  
   useEffect(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -58,7 +56,31 @@ function TimeSlider({ dates, selectedDate, onChange }) {
     setIsPlaying(prev => !prev);
   };
 
+
+  const generateTimelineMarks = () => {
+    if (!dates || dates.length < 2) return [];
+    
+    const marks = [];
+    const totalDates = dates.length;
+    
+    // Calculate the number of intervals based on the number of dates
+    const intervals = 4; 
+    for (let i = 0; i <= intervals; i++) {
+      const index = Math.floor((totalDates - 1) * (i / intervals));
+      if (index >= 0 && index < totalDates) {
+        marks.push({
+          value: index,
+          label: format(parseISO(formatDate(dates[index])), 'MMM yyyy')
+        });
+      }
+    }
+    
+    return marks;
+  };
+
   if (!dates || dates.length === 0) return null;
+
+  const timelineMarks = generateTimelineMarks();
 
   return (
     <Box sx={{ 
@@ -66,39 +88,121 @@ function TimeSlider({ dates, selectedDate, onChange }) {
       bottom: 20, 
       left: '50%', 
       transform: 'translateX(-50%)',
-      width: '80%',
-      maxWidth: 800,
-      bgcolor: 'rgba(255, 255, 255, 0.85)',
+      width: '92%', 
+      maxWidth: 1000,
+      bgcolor: 'rgba(255, 255, 255, 0.9)',
       borderRadius: 2,
-      p: 2,
+      p: 1.5,
       zIndex: 1000,
       boxShadow: 2
     }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-        <Typography variant="subtitle1" sx={{ flexGrow: 1 }}>
-          {selectedDate ? format(parseISO(formatDate(selectedDate)), 'MMM d, yyyy') : ''}
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+        <Typography variant="subtitle1" sx={{ 
+          flexGrow: 1, 
+          color: 'text.secondary',
+          fontSize: '0.95rem'
+        }}>
+          {selectedDate ? format(parseISO(formatDate(selectedDate)), 'MMMM d, yyyy') : ''}
         </Typography>
         <Button 
           onClick={handlePlayToggle} 
           size="small" 
           variant="contained"
           color={isPlaying ? "error" : "primary"}
-          sx={{ minWidth: '60px' }}
+          sx={{ 
+            minWidth: '60px',
+            py: 0.5,
+            fontSize: '0.8rem'
+          }}
         >
           {isPlaying ? 'Pause' : 'Play'}
         </Button>
       </Box>
-      <Slider
-        value={value}
-        onChange={handleSliderChange}
-        min={0}
-        max={dates.length - 1}
-        step={1}
-        marks={dates.length >= 2 ? [
-          { value: 0, label: format(parseISO(formatDate(dates[0])), 'MMM yyyy') },
-          { value: dates.length - 1, label: format(parseISO(formatDate(dates[dates.length - 1])), 'MMM yyyy') }
-        ] : []}
-      />
+      <Box sx={{ 
+        px: 2,
+        position: 'relative',
+        height: 32,
+      }}>
+        {/* Vertical marker lines for month indicators */}
+        {timelineMarks.map((mark, index) => (
+          <Box
+            key={index}
+            sx={{
+              position: 'absolute',
+              left: `calc(${(mark.value / (dates.length - 1)) * 100}% + 1px)`, 
+              height: '8px',
+              width: '1px',
+              backgroundColor: 'grey.400',
+              top: '11px',
+              zIndex: 1,    
+              transform: 'translateX(-50%)',
+            }}
+          />
+        ))}
+        
+        <Slider
+          value={value}
+          onChange={handleSliderChange}
+          min={0}
+          max={dates.length - 1}
+          step={1}
+          sx={{
+            color: '#1976d2',
+            height: 4,
+            padding: '13px 0',
+            '& .MuiSlider-thumb': {
+              height: 14,
+              width: 14,
+              backgroundColor: '#fff',
+              border: '2px solid currentColor',
+              '&:focus, &:hover, &.Mui-active': {
+                boxShadow: '0 0 0 6px rgba(25, 118, 210, 0.16)',
+              },
+              zIndex: 2,
+            },
+            '& .MuiSlider-track': {
+              height: 4,
+              border: 'none',
+            },
+            '& .MuiSlider-rail': {
+              height: 4,
+              opacity: 0.3,
+              backgroundColor: '#bdbdbd',
+            },
+            '& .MuiSlider-mark': {
+              display: 'none',
+            },
+          }}
+        />
+        
+        {/* Custom month labels */}
+        <Box sx={{ 
+          position: 'absolute', 
+          width: '100%',
+          top: 21,
+          left: 0,
+          display: 'flex',
+          justifyContent: 'space-between',
+          px: 0.5,
+        }}>
+          {timelineMarks.map((mark, index) => (
+            <Typography 
+              key={index} 
+              variant="caption" 
+              sx={{ 
+                fontSize: '0.65rem',
+                color: 'text.secondary',
+                transform: 'translateX(-50%)',
+                position: 'absolute',
+                left: `${(mark.value / (dates.length - 1)) * 100}%`,
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {mark.label}
+            </Typography>
+          ))}
+        </Box>
+      </Box>
     </Box>
   );
 }

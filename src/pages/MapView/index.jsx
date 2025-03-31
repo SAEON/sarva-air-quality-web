@@ -1,5 +1,4 @@
-// src/pages/MapView/index.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import { Box, CircularProgress, Typography, Paper } from '@mui/material';
@@ -7,6 +6,7 @@ import { getDateRange, getAllDates, getAirQualityByDate } from '@/api/airQuality
 import TimeSlider from '@/components/map/TimeSlider';
 import LayerControl from '@/components/map/LayerControl';
 import AirQualityLayer from '@/components/map/AirQualityLayer';
+import Sidebar from '@/components/map/Sidebar';
 import { getPM25ColorScale } from '@/utils/colorScale';
 import 'leaflet/dist/leaflet.css';
 
@@ -19,7 +19,12 @@ function MapView() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [dates, setDates] = useState([]);
   const [activeLayers, setActiveLayers] = useState(['airQuality']);
-  const [dateIndex, setDateIndex] = useState(0); // Track which date we're trying
+  const [dateIndex, setDateIndex] = useState(0);
+  const [filters, setFilters] = useState({
+    cities: [],
+    pm25Range: [0, 300],
+    densityRange: [0, 20000],
+  });
   
   // Get date range first
   const { data: dateRange, isLoading: isLoadingDateRange } = useQuery({
@@ -72,6 +77,33 @@ function MapView() {
     }
   });
 
+  // Filter data based on selected filters
+  const filteredData = useMemo(() => {
+    if (!airQualityData?.data) return [];
+    
+    let filtered = [...airQualityData.data];
+    
+    // Apply city filter if any cities are selected
+    if (filters.cities.length > 0) {
+      filtered = filtered.filter(item => 
+        filters.cities.includes(item.city)
+      );
+    }
+
+    // Apply PM2.5 range filter
+    filtered = filtered.filter(item => 
+      item.predicted_pm25 >= filters.pm25Range[0] && 
+      item.predicted_pm25 <= filters.pm25Range[1]
+    );
+
+    filtered = filtered.filter(item => 
+      item.pop_density_2010 >= filters.densityRange[0] && 
+      item.pop_density_2010 <= filters.densityRange[1]
+    );
+    
+    return filtered;
+  }, [airQualityData?.data, filters.cities, filters.pm25Range, filters.densityRange]);
+
   const handleDateChange = (date) => {
     const formattedDate = date.split('T')[0];
     // Find the index of this date in our dates array
@@ -90,6 +122,22 @@ function MapView() {
         return [...prev, layerId];
       }
     });
+  };
+
+  
+  const handleFilterChange = (filter) => {
+    if (filter.type === 'clearAll') {
+      setFilters({
+        cities: [],
+        pm25Range: [0, 300],
+        densityRange: [0, 20000]
+      });
+    } else {
+      setFilters(prev => ({
+        ...prev,
+        [filter.type]: filter.value
+      }));
+    }
   };
 
   const colorScale = getPM25ColorScale();
@@ -125,11 +173,11 @@ function MapView() {
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
         
-        {airQualityData && airQualityData.data && airQualityData.data.length > 0 && (
+        {filteredData.length > 0 && (
           <>
             {activeLayers.includes('airQuality') && (
               <AirQualityLayer 
-                data={airQualityData.data} 
+                data={filteredData} 
                 colorScale={colorScale}
                 visualizationType="airQuality"
               />
@@ -137,7 +185,7 @@ function MapView() {
             
             {activeLayers.includes('population') && (
               <AirQualityLayer 
-                data={airQualityData.data} 
+                data={filteredData} 
                 colorScale={colorScale}
                 visualizationType="population"
               />
@@ -145,6 +193,8 @@ function MapView() {
           </>
         )}
       </MapContainer>
+      
+      <Sidebar onFilterChange={handleFilterChange} />
       
       <LayerControl 
         layers={availableLayers}
@@ -234,7 +284,6 @@ function MapView() {
                     fontSize: '0.7rem',
                     whiteSpace: 'nowrap'
                   }}>
-
                     {item.value} - {item.description}
                   </Typography>
                 </Box>

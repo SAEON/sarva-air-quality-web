@@ -48,3 +48,15 @@ export const getTimeSeries = async ({ queryKey }) => {
   });
   return response.data;
 };
+
+
+export const getPM25Stats = async () => {
+  const response = await apiClient.get('/air-quality/stats/pm25');
+  return response.data;
+};
+
+
+export const getPopulationDensityStats = async () => {
+  const response = await apiClient.get('/air-quality/stats/population-density');
+  return response.data;
+};
