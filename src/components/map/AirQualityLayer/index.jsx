@@ -23,7 +23,7 @@ function AirQualityLayer({ data, colorScale, visualizationType = 'airQuality' })
 
   useEffect(() => {
     if (!data || data.length === 0) {
-      logger.info('No data to display in AirQualityLayer');
+      logger.info('No data to display in Air Quality Layer');
       return;
     }
 
@@ -53,7 +53,7 @@ function AirQualityLayer({ data, colorScale, visualizationType = 'airQuality' })
         if (visualizationType === 'airQuality') {
           value = point.predicted_pm25;
           color = colorScale(value);
-          radius = 8;
+          radius = Math.min(3 + value / 10, 15);
         } else if (visualizationType === 'population') {
           value = point.pop_density_2010;
           color = getPopulationDensityScale()(value);
