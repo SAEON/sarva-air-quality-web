@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import { Box, CircularProgress, Typography, Paper } from '@mui/material';
 import { getDateRange, getAllDates, getAirQualityByDate } from '@/api/airQuality';
+import SAEONLogo from '@/components/map/logo/SAEONLogo';
 import TimeSlider from '@/components/map/TimeSlider';
 import LayerControl from '@/components/map/LayerControl';
 import AirQualityLayer from '@/components/map/AirQualityLayer';
@@ -328,6 +329,17 @@ function MapView() {
         </Box>
       )}
 
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 20,
+          right: 10,
+          zIndex: 1000,
+          width: '150px',
+        }}
+      >
+        <SAEONLogo />
+      </Box>
       <TimeSlider dates={dates} selectedDate={selectedDate} onChange={handleDateChange} />
     </Box>
   );

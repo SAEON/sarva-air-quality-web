@@ -52,7 +52,7 @@ function LayerControl({ layers, activeLayers, onLayerToggle }) {
       }}
     >
       <Typography variant="subtitle1" gutterBottom>
-        Map Layers
+        Layers
       </Typography>
       <FormControl component="fieldset" fullWidth>
         <RadioGroup value={activeLayer || ''} onChange={handleLayerChange}>
