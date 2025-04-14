@@ -8,6 +8,7 @@ import TimeSlider from '@/components/map/TimeSlider';
 import LayerControl from '@/components/map/LayerControl';
 import AirQualityLayer from '@/components/map/AirQualityLayer';
 import Sidebar from '@/components/map/Sidebar';
+import InfoControl from '@/components/map/InfoControl';
 import 'leaflet/dist/leaflet.css';
 import { getPM25ColorScale, getAQILevels, getPopulationDensityLevels } from '@/utils/colorScale';
 
@@ -38,6 +39,8 @@ function MapView() {
     pm25Range: [0, 300],
     densityRange: [0, 20000],
   });
+  const [infoOpen, setInfoOpen] = useState(false);
+  const [timeSliderPlaying, setTimeSliderPlaying] = useState(false);
 
   const { data: dateRange, isLoading: isLoadingDateRange } = useQuery({
     queryKey: ['dateRange'],
@@ -141,6 +144,21 @@ function MapView() {
     }
   };
 
+  // Handle info panel toggling
+  const handleInfoToggle = (isOpen) => {
+    setInfoOpen(isOpen);
+
+    // If info panel is opening and time slider is playing, save state and pause it
+    if (isOpen && timeSliderPlaying) {
+      setTimeSliderPlaying(false);
+    }
+  };
+
+  // Handle time slider play/pause state
+  const handleTimeSliderPlayingChange = (isPlaying) => {
+    setTimeSliderPlaying(isPlaying);
+  };
+
   const colorScale = getPM25ColorScale();
 
   if (isLoadingDateRange || isLoadingDates || !selectedDate) {
@@ -190,6 +208,8 @@ function MapView() {
             )}
           </>
         )}
+
+        <InfoControl position="bottomleft" onInfoToggle={handleInfoToggle} />
       </MapContainer>
 
       <Sidebar onFilterChange={handleFilterChange} />
@@ -340,7 +360,15 @@ function MapView() {
       >
         <SAEONLogo />
       </Box>
-      <TimeSlider dates={dates} selectedDate={selectedDate} onChange={handleDateChange} />
+
+      {/* Pass the infoOpen state to TimeSlider to prevent playing when info is open */}
+      <TimeSlider
+        dates={dates}
+        selectedDate={selectedDate}
+        onChange={handleDateChange}
+        infoOpen={infoOpen}
+        onPlayingChange={handleTimeSliderPlayingChange}
+      />
     </Box>
   );
 }

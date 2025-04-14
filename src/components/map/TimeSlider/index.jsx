@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { Box, Slider, Typography, Button } from '@mui/material';
 import { format, parseISO } from 'date-fns';
 
-function TimeSlider({ dates, selectedDate, onChange }) {
+function TimeSlider({ dates, selectedDate, onChange, infoOpen = false, onPlayingChange }) {
   const [value, setValue] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const intervalRef = useRef(null);
+  const prevPlayingState = useRef(false);
 
   useEffect(() => {
     if (selectedDate && dates.length > 0) {
@@ -15,6 +16,19 @@ function TimeSlider({ dates, selectedDate, onChange }) {
       }
     }
   }, [selectedDate, dates]);
+
+  // Handle info panel opening/closing
+  useEffect(() => {
+    if (infoOpen && isPlaying) {
+      // Info panel opened while playing - save state and pause
+      prevPlayingState.current = true;
+      setIsPlaying(false);
+    } else if (!infoOpen && prevPlayingState.current) {
+      // Info panel closed and was playing before - resume playing
+      setIsPlaying(true);
+      prevPlayingState.current = false;
+    }
+  }, [infoOpen, isPlaying]);
 
   const formatDate = (dateString) => dateString.split('T')[0];
 
@@ -35,13 +49,18 @@ function TimeSlider({ dates, selectedDate, onChange }) {
       }, 1000);
     }
 
+    // Notify parent component about playing state change
+    if (onPlayingChange) {
+      onPlayingChange(isPlaying);
+    }
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     };
-  }, [isPlaying, dates, onChange]);
+  }, [isPlaying, dates, onChange, onPlayingChange]);
 
   const handleSliderChange = (_, newValue) => {
     setValue(newValue);
@@ -50,7 +69,10 @@ function TimeSlider({ dates, selectedDate, onChange }) {
   };
 
   const handlePlayToggle = () => {
-    setIsPlaying((prev) => !prev);
+    // Only allow play toggle when info panel is closed
+    if (!infoOpen) {
+      setIsPlaying((prev) => !prev);
+    }
   };
 
   const generateTimelineMarks = () => {
@@ -115,6 +137,7 @@ function TimeSlider({ dates, selectedDate, onChange }) {
             py: 0.5,
             fontSize: '0.8rem',
           }}
+          disabled={infoOpen} // Disable button when info panel is open
         >
           {isPlaying ? 'Pause' : 'Play'}
         </Button>
