@@ -19,7 +19,6 @@ const logger = {
     }
   },
   error: (message, error) => {
-    // Always log errors
     console.error(`[MapView] ${message}`, error);
   },
 };

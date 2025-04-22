@@ -3,19 +3,37 @@ import { Box } from '@mui/material';
 const SAEONLogo = () => (
   <Box
     sx={{
+      position: 'absolute',
+      bottom: 10,
+      right: 10,
       display: 'flex',
-      justifyContent: 'center',
-      backgroundColor: 'rgba(255, 255, 255, 0.7)',
-      padding: '4px',
-      borderRadius: '4px',
+      alignItems: 'center',
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      padding: '6px 14px',
+      borderRadius: '6px',
+      boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+      zIndex: 1000,
+      gap: 2,
     }}
   >
-    <img
+    <Box
+      component="img"
       src="/assets/saeon_logo.png"
       alt="SAEON Logo"
-      style={{
-        width: '100%',
-        height: 'auto',
+      sx={{
+        height: 40,
+        maxWidth: 100,
+        objectFit: 'contain',
+      }}
+    />
+    <Box
+      component="img"
+      src="/assets/zindi.png"
+      alt="zindi Logo"
+      sx={{
+        height: 40,
+        maxWidth: 100,
+        objectFit: 'contain',
       }}
     />
   </Box>
