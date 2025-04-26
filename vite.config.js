@@ -10,8 +10,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  // Base URL for assets - if deploying to a subdirectory, change this
-  base: './',
+  // Base URL for assets
+  base: '/air-quality/',
   server: {
     headers: {
       'Access-Control-Allow-Origin': '*',
