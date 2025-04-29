@@ -18,7 +18,7 @@ const SAEONLogo = () => (
   >
     <Box
       component="img"
-      src="/assets/saeon_logo.png"
+      src="/air-quality/assets/saeon_logo.png"
       alt="SAEON Logo"
       sx={{
         height: 40,
@@ -28,7 +28,7 @@ const SAEONLogo = () => (
     />
     <Box
       component="img"
-      src="/assets/zindi.png"
+      src="/air-quality/assets/zindi.png"
       alt="zindi Logo"
       sx={{
         height: 40,
