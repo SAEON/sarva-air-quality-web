@@ -105,10 +105,10 @@ function TimeSlider({ dates, selectedDate, onChange, infoOpen = false, onPlaying
       sx={{
         position: 'absolute',
         bottom: 20,
-        left: '50%',
+        left: '45%',
         transform: 'translateX(-50%)',
         width: '92%',
-        maxWidth: 1000,
+        maxWidth: { xs: 300, sm: 500, md: 650, lg: 800 },
         bgcolor: 'rgba(255, 255, 255, 0.9)',
         borderRadius: 2,
         p: 1.5,
@@ -137,7 +137,7 @@ function TimeSlider({ dates, selectedDate, onChange, infoOpen = false, onPlaying
             py: 0.5,
             fontSize: '0.8rem',
           }}
-          disabled={infoOpen} // Disable button when info panel is open
+          disabled={infoOpen}
         >
           {isPlaying ? 'Pause' : 'Play'}
         </Button>

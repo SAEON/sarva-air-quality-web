@@ -5,7 +5,7 @@ const SAEONLogo = () => (
     sx={{
       position: 'absolute',
       bottom: 10,
-      right: 10,
+      right: 25,
       display: 'flex',
       alignItems: 'center',
       backgroundColor: 'rgba(255, 255, 255, 0.9)',
