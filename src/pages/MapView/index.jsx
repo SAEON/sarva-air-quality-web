@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import { Box, CircularProgress, Typography, Paper } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import GetAppIcon from '@mui/icons-material/GetApp';
 import { getDateRange, getAllDates, getAirQualityByDate } from '@/api/airQuality';
 import SAEONLogo from '@/components/map/logo/SAEONLogo';
 import TimeSlider from '@/components/map/TimeSlider';
@@ -207,6 +209,40 @@ function MapView() {
             )}
           </>
         )}
+
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 128,
+            left: 10,
+            zIndex: 1000,
+          }}
+        >
+          <IconButton
+            component="a"
+            href="https://catalogue.saeon.ac.za/records/10.15493/SARVA.16032023"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              width: 38,
+              height: 38,
+              padding: 0,
+              backgroundColor: '#fff',
+              border: '4px solid #aaa',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#333',
+              '&:hover': {
+                backgroundColor: '#f0f0f0',
+              },
+            }}
+            title="Download Metadata"
+          >
+            <GetAppIcon fontSize="small" sx={{ color: '#333' }} /> {/* match info icon color */}
+          </IconButton>
+        </Box>
 
         <InfoControl position="bottomleft" onInfoToggle={handleInfoToggle} />
       </MapContainer>
