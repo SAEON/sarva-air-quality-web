@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import { Box, CircularProgress, Typography, Paper } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
@@ -34,7 +34,6 @@ function MapView() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [dates, setDates] = useState([]);
   const [activeLayers, setActiveLayers] = useState(['airQuality']);
-  const [dateIndex, setDateIndex] = useState(0);
   const [filters, setFilters] = useState({
     cities: [],
     pm25Range: [0, 300],
@@ -57,34 +56,20 @@ function MapView() {
   useEffect(() => {
     if (datesData?.dates && datesData.dates.length > 0) {
       setDates(datesData.dates);
-
-      if (!selectedDate) {
+      setSelectedDate((prev) => {
+        if (prev) return prev;
         const firstDate = datesData.dates[0].split('T')[0];
         logger.info(`Setting initial date: ${firstDate}`);
-        setSelectedDate(firstDate);
-      }
+        return firstDate;
+      });
     }
-  }, [datesData, selectedDate]);
+  }, [datesData]);
 
   const { data: airQualityData, isLoading: isLoadingAirQuality } = useQuery({
     queryKey: ['airQualityByDate', selectedDate],
     queryFn: getAirQualityByDate,
     enabled: !!selectedDate,
-    onSuccess: (data) => {
-      if (!data || !data.data || data.data.length === 0) {
-        logger.info(`No data found for date: ${selectedDate}, trying next date...`);
-
-        if (dates.length > dateIndex + 1) {
-          const nextIndex = dateIndex + 1;
-          const nextDate = dates[nextIndex].split('T')[0];
-          logger.info(`Trying next date: ${nextDate}`);
-          setDateIndex(nextIndex);
-          setSelectedDate(nextDate);
-        }
-      } else {
-        logger.info(`Found data for date: ${selectedDate}, data points: ${data.data.length}`);
-      }
-    },
+    placeholderData: keepPreviousData,
   });
 
   const filteredData = useMemo(() => {
@@ -110,15 +95,9 @@ function MapView() {
     return filtered;
   }, [airQualityData?.data, filters.cities, filters.pm25Range, filters.densityRange]);
 
-  const handleDateChange = (date) => {
-    const formattedDate = date.split('T')[0];
-
-    const index = dates.findIndex((d) => d.split('T')[0] === formattedDate);
-    if (index !== -1) {
-      setDateIndex(index);
-    }
-    setSelectedDate(formattedDate);
-  };
+  const handleDateChange = useCallback((date) => {
+    setSelectedDate(date.split('T')[0]);
+  }, []);
 
   const handleLayerToggle = (layerId) => {
     setActiveLayers((prev) => {
@@ -160,7 +139,7 @@ function MapView() {
     setTimeSliderPlaying(isPlaying);
   };
 
-  const colorScale = getPM25ColorScale();
+  const colorScale = useMemo(() => getPM25ColorScale(), []);
 
   if (isLoadingDateRange || isLoadingDates || !selectedDate) {
     return (

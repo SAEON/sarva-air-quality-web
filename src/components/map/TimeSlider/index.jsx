@@ -7,11 +7,13 @@ function TimeSlider({ dates, selectedDate, onChange, infoOpen = false, onPlaying
   const [isPlaying, setIsPlaying] = useState(false);
   const intervalRef = useRef(null);
   const prevPlayingState = useRef(false);
+  const valueRef = useRef(0);
 
   useEffect(() => {
     if (selectedDate && dates.length > 0) {
       const index = dates.findIndex((d) => formatDate(d) === formatDate(selectedDate));
       if (index !== -1) {
+        valueRef.current = index;
         setValue(index);
       }
     }
@@ -40,18 +42,11 @@ function TimeSlider({ dates, selectedDate, onChange, infoOpen = false, onPlaying
 
     if (isPlaying && dates.length > 0) {
       intervalRef.current = setInterval(() => {
-        setValue((prev) => {
-          const newValue = prev >= dates.length - 1 ? 0 : prev + 1;
-          const nextDate = formatDate(dates[newValue]);
-          onChange(nextDate);
-          return newValue;
-        });
+        const newValue = valueRef.current >= dates.length - 1 ? 0 : valueRef.current + 1;
+        valueRef.current = newValue;
+        setValue(newValue);
+        onChange(formatDate(dates[newValue]));
       }, 1000);
-    }
-
-    // Notify parent component about playing state change
-    if (onPlayingChange) {
-      onPlayingChange(isPlaying);
     }
 
     return () => {
@@ -60,12 +55,18 @@ function TimeSlider({ dates, selectedDate, onChange, infoOpen = false, onPlaying
         intervalRef.current = null;
       }
     };
-  }, [isPlaying, dates, onChange, onPlayingChange]);
+  }, [isPlaying, dates, onChange]);
+
+  useEffect(() => {
+    if (onPlayingChange) {
+      onPlayingChange(isPlaying);
+    }
+  }, [isPlaying, onPlayingChange]);
 
   const handleSliderChange = (_, newValue) => {
+    valueRef.current = newValue;
     setValue(newValue);
-    const selectedDate = formatDate(dates[newValue]);
-    onChange(selectedDate);
+    onChange(formatDate(dates[newValue]));
   };
 
   const handlePlayToggle = () => {

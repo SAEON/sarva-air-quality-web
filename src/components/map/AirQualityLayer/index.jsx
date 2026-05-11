@@ -52,12 +52,13 @@ function AirQualityLayer({ data, colorScale, visualizationType = 'airQuality' })
 
         if (visualizationType === 'airQuality') {
           value = point.predicted_pm25;
+          if (value === null || value === undefined) return;
           color = colorScale(value);
           radius = Math.min(3 + value / 10, 15);
         } else if (visualizationType === 'population') {
           value = point.pop_density_2010;
+          if (value === null || value === undefined) return;
           color = getPopulationDensityScale()(value);
-
           radius = Math.min(5 + value / 1000, 15);
         }
 
@@ -71,19 +72,27 @@ function AirQualityLayer({ data, colorScale, visualizationType = 'airQuality' })
         });
 
         let popupContent;
+        const pm25 =
+          point.predicted_pm25 !== null && point.predicted_pm25 !== undefined
+            ? point.predicted_pm25.toFixed(2)
+            : 'N/A';
+        const density =
+          point.pop_density_2010 !== null && point.pop_density_2010 !== undefined
+            ? point.pop_density_2010.toFixed(2)
+            : 'N/A';
         if (visualizationType === 'airQuality') {
           popupContent = `
             <strong>${point.city}</strong><br>
             Date: ${new Date(point.observation_date).toLocaleDateString()}<br>
-            PM2.5: ${point.predicted_pm25.toFixed(2)} µg/m³<br>
-            Population Density: ${point.pop_density_2010.toFixed(2)} people/km²
+            PM2.5: ${pm25} µg/m³<br>
+            Population Density: ${density} people/km²
           `;
         } else {
           popupContent = `
             <strong>${point.city}</strong><br>
             Date: ${new Date(point.observation_date).toLocaleDateString()}<br>
-            Population Density: ${point.pop_density_2010.toFixed(2)} people/km²<br>
-            PM2.5: ${point.predicted_pm25.toFixed(2)} µg/m³
+            Population Density: ${density} people/km²<br>
+            PM2.5: ${pm25} µg/m³
           `;
         }
 
